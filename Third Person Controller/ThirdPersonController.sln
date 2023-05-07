@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{09ab70aa-0c6a-88e1-0213-cc269fbe8872}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastScriptReload.Runtime", "FastScriptReload.Runtime.csproj", "{d56718a8-1491-79cd-65e2-ac42296e0108}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{59076650-4d27-d32b-edbe-60d73c5b81f4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastScriptReload.Editor", "FastScriptReload.Editor.csproj", "{4c6cab16-6c64-4391-e373-c56075cdbfc8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09ab70aa-0c6a-88e1-0213-cc269fbe8872}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09ab70aa-0c6a-88e1-0213-cc269fbe8872}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{d56718a8-1491-79cd-65e2-ac42296e0108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{d56718a8-1491-79cd-65e2-ac42296e0108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59076650-4d27-d32b-edbe-60d73c5b81f4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59076650-4d27-d32b-edbe-60d73c5b81f4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4c6cab16-6c64-4391-e373-c56075cdbfc8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4c6cab16-6c64-4391-e373-c56075cdbfc8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
