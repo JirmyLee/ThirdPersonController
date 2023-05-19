@@ -1063,53 +1063,23 @@
      <Reference Include="System.Xml.Serialization">
      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.8f1c1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.VisualScripting.Flow.Editor">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.VSCode.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
      </Reference>
      <Reference Include="Unity.RenderPipelines.Universal.Shaders">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
-     </Reference>
-     <Reference Include="PPv2URPConverters">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.TextMeshPro.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.VisualStudio.Editor">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.Timeline">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.VisualScripting.Core.Editor">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.TextMeshPro">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
      </Reference>
      <Reference Include="Unity.VisualScripting.State.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.Burst.Editor">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.Searcher.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.RenderPipelines.Core.Runtime">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.VisualScripting.Flow">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
      </Reference>
      <Reference Include="UnityEditor.UI">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
@@ -1129,23 +1099,65 @@
      <Reference Include="UnityEngine.UI">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
      </Reference>
+     <Reference Include="Unity.ShaderGraph.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Cinemachine">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Cinemachine.dll</HintPath>
+     </Reference>
+     <Reference Include="com.unity.cinemachine.editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\com.unity.cinemachine.editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Mathematics.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="SingularityGroup.HotReload.Runtime.Public">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\SingularityGroup.HotReload.Runtime.Public.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.VisualScripting.Flow.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+     </Reference>
+     <Reference Include="PPv2URPConverters">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.VisualStudio.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Timeline">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.VisualScripting.Core.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.TextMeshPro">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Burst.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.RenderPipelines.Core.Runtime">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.VisualScripting.Flow">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
+     </Reference>
      <Reference Include="Unity.PlasticSCM.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Services.Core">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
      </Reference>
      <Reference Include="Unity.VisualScripting.Core">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
      </Reference>
      <Reference Include="Unity.Mathematics">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.ShaderGraph.Editor">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.Services.Core">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
-     </Reference>
-     <Reference Include="Cinemachine">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Cinemachine.dll</HintPath>
      </Reference>
      <Reference Include="Unity.Services.Core.Analytics">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
@@ -1162,26 +1174,17 @@
      <Reference Include="Unity.VisualScripting.Shared.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="com.unity.cinemachine.editor">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\com.unity.cinemachine.editor.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.Services.Core.Environments">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Services.Core.Environments.dll</HintPath>
      </Reference>
      <Reference Include="Unity.Timeline.Editor">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
      </Reference>
-     <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
-     </Reference>
      <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
      </Reference>
      <Reference Include="UnityEditor.XR.LegacyInputHelpers">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\UnityEditor.XR.LegacyInputHelpers.dll</HintPath>
-     </Reference>
-     <Reference Include="Unity.Mathematics.Editor">
-     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
      </Reference>
      <Reference Include="UnityEditor.SpatialTracking">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\UnityEditor.SpatialTracking.dll</HintPath>
