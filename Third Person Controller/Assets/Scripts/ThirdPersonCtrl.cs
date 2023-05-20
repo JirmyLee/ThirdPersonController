@@ -17,7 +17,8 @@ public enum PlayerPosture
 {
     Crouch,     //下蹲
     Stand,      //站立
-    Midair      //滞空
+    Midair,     //滞空
+    Landing,    //着陆（玩家刚落地还不能起跳的状态）
 }
 
 //运动状态
@@ -47,9 +48,10 @@ public class ThirdPersonCtrl : MonoBehaviour
 
     [HideInInspector]
     public PlayerPosture playerPosture = PlayerPosture.Stand;
-    private const float crouchThreshold = 0f;   //和状态机里空手运动BlendTree的阈值一致
-    private const float standThreshold = 1f;
-    private const float midairThreshold = 2.1f; //多0.1保证跳跃时参数大于2，防止抖动
+    private float crouchThreshold = 0f;   //和状态机里空手运动BlendTree的阈值一致
+    private float standThreshold = 1f;
+    private float midairThreshold = 2.1f; //多0.1保证跳跃时参数大于2，防止抖动
+    private float landingThreshold = 1f;  //着陆强度阈值（可以用下蹲强度表示着陆强度）
 
     [HideInInspector]
     public LocomotionState locomotionState = LocomotionState.Idle;
@@ -77,6 +79,9 @@ public class ThirdPersonCtrl : MonoBehaviour
     private float verticalVelocity; //当前角色垂直方向速度
     public float maxHeight = 1.2f;   //最大跳跃高度
     private float fallMultiplier = 1.5f;    //下落速度相对跳跃速度的倍率，下落速度快虽然反物理，但能增强游戏质感
+
+    private float jumpCD = 0.5f;    //跳跃CD
+    private bool isLanding;
     
     private static readonly int CACHE_SIZE = 3; //离地前几帧速度缓存帧数
     private Vector3[] velCache = new Vector3[CACHE_SIZE];
@@ -151,6 +156,14 @@ public class ThirdPersonCtrl : MonoBehaviour
         if (!isGrounded)    //不在地面就要处于滞空，包括从平台下落
         {
             playerPosture = PlayerPosture.Midair;
+        }
+        else if (playerPosture == PlayerPosture.Midair)
+        {
+            StartCoroutine(CoolDownJump());
+        }
+        else if (isLanding)
+        {
+            playerPosture = PlayerPosture.Landing;
         }
         else if (isCrouch)
         {
@@ -229,7 +242,7 @@ public class ThirdPersonCtrl : MonoBehaviour
     //计算重力影响
     void CaculateGravity()
     {
-        if (isGrounded)
+        if (playerPosture != PlayerPosture.Midair)
         {
             verticalVelocity = gravity * Time.deltaTime;   //角色站在地面上，垂直速度归零，如果使用characterController.isGrounded,这里要一直施加向下的力，使用值gravity * Time.deltaTime
             return;
@@ -247,6 +260,19 @@ public class ThirdPersonCtrl : MonoBehaviour
         }
     }
 
+    //等待跳跃CD
+    IEnumerator CoolDownJump()
+    {
+        //计算landingThreshold，让它处于下蹲的0.5到站立的阈值1之间
+        landingThreshold = Mathf.Clamp(verticalVelocity, -10, 0);
+        landingThreshold /= 20;     //-0.5~0
+        landingThreshold += 1f;     //0.5~1
+        isLanding = true;   //如果上一帧处于滞空，则设为着陆状态
+        playerPosture = PlayerPosture.Landing;
+        yield return new WaitForSeconds(jumpCD);
+        isLanding = false;
+    }
+    
     //设置动画参数
     void SetupAnimator()
     {
@@ -286,8 +312,26 @@ public class ThirdPersonCtrl : MonoBehaviour
             animator.SetFloat(verticalVelHash, verticalVelocity);
             Debug.LogFormat("set Midair status");
         }
+        else if (playerPosture == PlayerPosture.Landing)
+        {
+            //和PlayerPosture.Stand一致
+            animator.SetFloat(postureHash, standThreshold, 0.03f, Time.deltaTime);    //这边下蹲动画和跳跃动画匹配不上，暂时不用
+            switch (locomotionState)
+            {
+                case LocomotionState.Idle:
+                    animator.SetFloat(moveSpeedHash, 0, 0.1f, Time.deltaTime);
+                    break;
+                case LocomotionState.Walk:
+                    animator.SetFloat(moveSpeedHash, playerMovement.magnitude * walkSpeed, 0.1f, Time.deltaTime);
+                    Debug.LogFormat("set walk speed is {0}",playerMovement.magnitude * walkSpeed);
+                    break;
+                case LocomotionState.Run:
+                    animator.SetFloat(moveSpeedHash, playerMovement.magnitude * runSpeed, 0.1f, Time.deltaTime);
+                    break;
+            }
+        }
 
-        if (attackState == AttackState.Normal)
+        if (attackState == AttackState.Normal && playerPosture != PlayerPosture.Midair)
         {
             //对玩家运动方向的x和z分量求arctan,得到玩家当前的运动方向和正前方向的夹角（弧度，和状态机的转向速度单位一致）
             float rad = Mathf.Atan2(playerMovement.x, playerMovement.z);
@@ -335,7 +379,7 @@ public class ThirdPersonCtrl : MonoBehaviour
 
     private void Jump()
     {
-        if (isGrounded && isJumping)
+        if (playerPosture == PlayerPosture.Stand && isJumping)
         {
             Debug.Log("jump here");
             verticalVelocity = Mathf.Sqrt(-2 * gravity * maxHeight);        //自由落体公式v^2 = 2gh => v = sqrt(2gh)
