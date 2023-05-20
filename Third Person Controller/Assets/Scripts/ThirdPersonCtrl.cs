@@ -17,7 +17,8 @@ public enum PlayerPosture
 {
     Crouch,     //下蹲
     Stand,      //站立
-    Midair,     //滞空
+    Jumping,    //跳跃
+    Falling,    //高处跌落
     Landing,    //着陆（玩家刚落地还不能起跳的状态）
 }
 
@@ -73,7 +74,7 @@ public class ThirdPersonCtrl : MonoBehaviour
     private int verticalVelHash;
     
     Vector3 playerMovement = Vector3.zero;  //玩家实际要移动的方向
-    private bool isGrounded = false;
+    private bool isGrounded = false;//玩家是否着地
     private float groundCheckOffset = 0.2f; //地面检测射线偏移量
     public float gravity = -15f;    //模拟重力，很多游戏重力都超过实际
     private float verticalVelocity; //当前角色垂直方向速度
@@ -82,6 +83,9 @@ public class ThirdPersonCtrl : MonoBehaviour
 
     private float jumpCD = 0.5f;    //跳跃CD
     private bool isLanding;
+    
+    private bool couldFall;         //玩家是否可以跌落
+    private float fallHeight = 0.5f;        //跌落的最小高度，小于此高度不会切换到跌落姿态
     
     private static readonly int CACHE_SIZE = 3; //离地前几帧速度缓存帧数
     private Vector3[] velCache = new Vector3[CACHE_SIZE];
@@ -155,9 +159,19 @@ public class ThirdPersonCtrl : MonoBehaviour
         // }
         if (!isGrounded)    //不在地面就要处于滞空，包括从平台下落
         {
-            playerPosture = PlayerPosture.Midair;
+            if (verticalVelocity > 0)   //垂直速度>0说明处于跳跃姿态
+            {
+                playerPosture = PlayerPosture.Jumping;
+            }
+            else if (playerPosture != PlayerPosture.Jumping)    //不是跳跃下落状态
+            {
+                if (couldFall)
+                {
+                    playerPosture = PlayerPosture.Falling;
+                }
+            }
         }
-        else if (playerPosture == PlayerPosture.Midair)
+        else if (playerPosture == PlayerPosture.Jumping)
         {
             StartCoroutine(CoolDownJump());
         }
@@ -234,6 +248,9 @@ public class ThirdPersonCtrl : MonoBehaviour
         {
             Debug.Log("not int ground");
             isGrounded = false;
+            
+            //角色没有着地就检测角色脚0.5米内是否能够检测到地面，如果能则认为可以跌落
+            couldFall = !Physics.Raycast(playerTransform.position, Vector3.down, fallHeight, ignoreMask);
         }
 
         return;
@@ -242,14 +259,21 @@ public class ThirdPersonCtrl : MonoBehaviour
     //计算重力影响
     void CaculateGravity()
     {
-        if (playerPosture != PlayerPosture.Midair)
+        if (playerPosture != PlayerPosture.Jumping && playerPosture != PlayerPosture.Falling)
         {
-            verticalVelocity = gravity * Time.deltaTime;   //角色站在地面上，垂直速度归零，如果使用characterController.isGrounded,这里要一直施加向下的力，使用值gravity * Time.deltaTime
+            if (!isGrounded)
+            {
+                verticalVelocity += gravity * Time.deltaTime;   //不是跳跃也不是跌落状态，但双脚离地，此时也要累加重力加速度，让下楼梯这种短距离地能下落
+            }
+            else
+            {
+                verticalVelocity = 0;   //角色站在地面上，垂直速度归零，如果使用characterController.isGrounded,这里要一直施加向下的力，使用值gravity * Time.deltaTime
+            }
             return;
         }
         else
         {
-            if (verticalVelocity <= 0)  //下落阶段
+            if (verticalVelocity <= 0 || !isJumping)  //下落阶段
             {
                 verticalVelocity += gravity * fallMultiplier * Time.deltaTime;
             }
@@ -267,7 +291,7 @@ public class ThirdPersonCtrl : MonoBehaviour
         landingThreshold = Mathf.Clamp(verticalVelocity, -10, 0);
         landingThreshold /= 20;     //-0.5~0
         landingThreshold += 1f;     //0.5~1
-        isLanding = true;   //如果上一帧处于滞空，则设为着陆状态
+        isLanding = true;   //上一帧处于跳跃姿态，则设为着陆状态，着陆状态下不能再跳跃
         playerPosture = PlayerPosture.Landing;
         yield return new WaitForSeconds(jumpCD);
         isLanding = false;
@@ -306,7 +330,7 @@ public class ThirdPersonCtrl : MonoBehaviour
                     break;
             }
         }
-        else if (playerPosture == PlayerPosture.Midair)
+        else if (playerPosture == PlayerPosture.Jumping || playerPosture == PlayerPosture.Falling)
         {
             animator.SetFloat(postureHash, midairThreshold);
             animator.SetFloat(verticalVelHash, verticalVelocity);
@@ -314,7 +338,7 @@ public class ThirdPersonCtrl : MonoBehaviour
         }
         else if (playerPosture == PlayerPosture.Landing)
         {
-            //和PlayerPosture.Stand一致
+            //和PlayerPosture.Stand基本一致
             animator.SetFloat(postureHash, standThreshold, 0.03f, Time.deltaTime);    //这边下蹲动画和跳跃动画匹配不上，暂时不用
             switch (locomotionState)
             {
@@ -331,7 +355,7 @@ public class ThirdPersonCtrl : MonoBehaviour
             }
         }
 
-        if (attackState == AttackState.Normal && playerPosture != PlayerPosture.Midair)
+        if (attackState == AttackState.Normal && playerPosture != PlayerPosture.Jumping)
         {
             //对玩家运动方向的x和z分量求arctan,得到玩家当前的运动方向和正前方向的夹角（弧度，和状态机的转向速度单位一致）
             float rad = Mathf.Atan2(playerMovement.x, playerMovement.z);
@@ -355,10 +379,27 @@ public class ThirdPersonCtrl : MonoBehaviour
         return avarage / velCache.Length;
     }
 
-    //接管rootmotion位移
+    //播放脚步声
+    // void PlayFootStep()
+    // {
+    //     if (playerPosture != PlayerPosture.Jumping && playerPosture != PlayerPosture.Falling)
+    //     {
+    //         if (locomotionState == LocomotionState.Walk || locomotionState == LocomotionState.Run)
+    //         {
+    //             float currentFootCycle = Mathf.Repeat(animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1f); ;
+    //             if ((lastFootCycle < 0.1 && currentFootCycle >= 0.1) || (currentFootCycle >= 0.6 && lastFootCycle < 0.6))
+    //             {
+    //                 playerSoundController.PlayFootStep();
+    //             }
+    //             lastFootCycle = currentFootCycle;
+    //         }
+    //     }
+    // }
+    
+    //动画系统回调方法，接管rootmotion位移
     private void OnAnimatorMove()
     {
-        if (playerPosture != PlayerPosture.Midair)
+        if (playerPosture != PlayerPosture.Jumping && playerPosture != PlayerPosture.Falling)
         {
             Vector3 playerDeltaMovement = animator.deltaPosition;
             playerDeltaMovement.y = verticalVelocity * Time.deltaTime;
