@@ -63,10 +63,10 @@ public class ThirdPersonCtrl : MonoBehaviour
     private const float runSpeed = 5.5f;
 
     private Vector2 MoveInput;
-    private bool isRunning;
-    private bool isCrouch;
-    private bool isJumping;
-    private bool isAttacking;
+    private bool isRuPress;
+    private bool isCrouchPress;
+    private bool isJumpPress;
+    private bool isAttackPress;
 
     private int postureHash;    //动画状态机玩家姿态参数哈希值，使用哈希值比直接使用字符串效率高
     private int moveSpeedHash;
@@ -115,6 +115,7 @@ public class ThirdPersonCtrl : MonoBehaviour
         Jump();
         CaculateInputDirection();
         SetupAnimator();
+        //PlayFootStep();
     }
 
     #region 输入相关
@@ -124,20 +125,20 @@ public class ThirdPersonCtrl : MonoBehaviour
     }
     public void GetRunInput(InputAction.CallbackContext ctx)
     {
-        isRunning = ctx.ReadValueAsButton();
+        isRuPress = ctx.ReadValueAsButton();
     }
     public void GetCrouchInput(InputAction.CallbackContext ctx)
     {
-        isCrouch = ctx.ReadValueAsButton();
+        isCrouchPress = ctx.ReadValueAsButton();
     }
     public void GetAttackInput(InputAction.CallbackContext ctx)
     {
-        isAttacking = ctx.ReadValueAsButton();
+        isAttackPress = ctx.ReadValueAsButton();
     }
 
     public void GetJumpInput(InputAction.CallbackContext ctx)
     {
-        isJumping = ctx.ReadValueAsButton();
+        isJumpPress = ctx.ReadValueAsButton();
         //Debug.Log("is jump!");
     }
     #endregion
@@ -153,47 +154,68 @@ public class ThirdPersonCtrl : MonoBehaviour
     //切换玩家状态
     void SwitchPlayerStates()
     {
-        // if (isJumping)
-        // {
-        //     playerPosture = PlayerPosture.Midair;
-        // }
-        if (!isGrounded)    //不在地面就要处于滞空，包括从平台下落
+        switch (playerPosture)
         {
-            if (verticalVelocity > 0)   //垂直速度>0说明处于跳跃姿态
-            {
-                playerPosture = PlayerPosture.Jumping;
-            }
-            else if (playerPosture != PlayerPosture.Jumping)    //不是跳跃下落状态
-            {
-                if (couldFall)
+            case PlayerPosture.Stand:
+                if (verticalVelocity > 0)   //垂直速度>0说明处于跳跃姿态
+                {
+                    playerPosture = PlayerPosture.Jumping;
+                }
+                else if (!isGrounded && couldFall)
                 {
                     playerPosture = PlayerPosture.Falling;
                 }
-            }
+                else if (isCrouchPress)
+                {
+                    playerPosture = PlayerPosture.Crouch;
+                }
+                break;
+            case PlayerPosture.Crouch:
+                if (!isGrounded && couldFall)
+                {
+                    playerPosture = PlayerPosture.Falling;
+                }
+                else if (!isCrouchPress)
+                {
+                    playerPosture = PlayerPosture.Stand;
+                }
+                break;
+            case PlayerPosture.Falling:
+                if (isGrounded)
+                {
+                    StartCoroutine(CoolDownJump());
+                }
+
+                if (isLanding)
+                {
+                    playerPosture = PlayerPosture.Landing;
+                }
+                break;
+            case PlayerPosture.Jumping:
+                if (isGrounded)
+                {
+                    StartCoroutine(CoolDownJump());
+                }
+                
+                if (isLanding)
+                {
+                    playerPosture = PlayerPosture.Landing;
+                }
+                break;
+            case PlayerPosture.Landing:
+                if (!isLanding)
+                {
+                    playerPosture = PlayerPosture.Stand;
+                }
+                break;
         }
-        else if (playerPosture == PlayerPosture.Jumping)
-        {
-            StartCoroutine(CoolDownJump());
-        }
-        else if (isLanding)
-        {
-            playerPosture = PlayerPosture.Landing;
-        }
-        else if (isCrouch)
-        {
-            playerPosture = PlayerPosture.Crouch;
-        }
-        else
-        {
-            playerPosture = PlayerPosture.Stand;
-        }
+        
 
         if (MoveInput.magnitude == 0)   //玩家没输入
         {
             locomotionState = LocomotionState.Idle;
-            averageVel = Vector3.zero;  //离地前几帧平均值设为0，防止原地跳取之前的值
         }
-        else if (!isRunning)
+        else if (!isRuPress)
         {
             locomotionState = LocomotionState.Walk;
         }
@@ -202,7 +224,7 @@ public class ThirdPersonCtrl : MonoBehaviour
             locomotionState = LocomotionState.Run;
         }
 
-        if (isAttacking)
+        if (isAttackPress)
         {
             attackState = AttackState.Attack;
         }
@@ -228,8 +250,9 @@ public class ThirdPersonCtrl : MonoBehaviour
     private void CheckGrounded()
     {
         Vector3 pointBottom, pointTop;  //分别为胶囊体起点球心，胶囊体终点球心
-        pointBottom = playerTransform.position + playerTransform.up * capsuleCollider.radius - playerTransform.up * 0.1f;
-        pointTop = playerTransform.position + playerTransform.up * capsuleCollider.height - playerTransform.up * capsuleCollider.radius;
+        //- playerTransform.up * 0.02f是为了在脚步往下一点的地方进行检测， - playerTransform.forward * 0.04是在角色中心往后一点检测，防止对着墙跳时能卡在中间
+        pointBottom = playerTransform.position + playerTransform.up * capsuleCollider.radius - playerTransform.up * 0.02f - playerTransform.forward * 0.04f;
+        pointTop = playerTransform.position + playerTransform.up * capsuleCollider.height - playerTransform.up * capsuleCollider.radius -playerTransform.forward * 0.04f;
         LayerMask ignoreMask = ~(1 << LayerMask.NameToLayer("Player")); //LayerMask.GetMask("Player")
         Debug.DrawLine(pointBottom, pointTop,Color.green);
  
@@ -263,17 +286,17 @@ public class ThirdPersonCtrl : MonoBehaviour
         {
             if (!isGrounded)
             {
-                verticalVelocity += gravity * Time.deltaTime;   //不是跳跃也不是跌落状态，但双脚离地，此时也要累加重力加速度，让下楼梯这种短距离地能下落
+                verticalVelocity += gravity * fallMultiplier * Time.deltaTime;   //不是跳跃也不是跌落状态，但双脚离地，此时也要累加重力加速度，让下楼梯这种短距离地能下落
             }
             else
             {
-                verticalVelocity = 0;   //角色站在地面上，垂直速度归零，如果使用characterController.isGrounded,这里要一直施加向下的力，使用值gravity * Time.deltaTime
+                verticalVelocity = 0;   //如果检测到地面，垂直速度归零。如果不归零（如character controller使用gravity * Time.deltaTime），在斜坡会缓慢往下掉
             }
             return;
         }
         else
         {
-            if (verticalVelocity <= 0 || !isJumping)  //下落阶段
+            if (verticalVelocity <= 0 || !isJumpPress)  //下落阶段
             {
                 verticalVelocity += gravity * fallMultiplier * Time.deltaTime;
             }
@@ -406,7 +429,7 @@ public class ThirdPersonCtrl : MonoBehaviour
             //Debug.LogFormat("playerDeltaMovement.y:{0}",playerDeltaMovement.y);
             playerTransform.position += playerDeltaMovement;
             averageVel = AverageVel(animator.velocity);
-            //Debug.LogFormat("avgvel:{0}",averageVel);
+            //Debug.LogFormat("avgvel:{0},playerDeltaMovement：{1}",averageVel,playerDeltaMovement);
         }
         else
         {
@@ -420,7 +443,7 @@ public class ThirdPersonCtrl : MonoBehaviour
 
     private void Jump()
     {
-        if (playerPosture == PlayerPosture.Stand && isJumping)
+        if (playerPosture == PlayerPosture.Stand && isJumpPress)
         {
             Debug.Log("jump here");
             verticalVelocity = Mathf.Sqrt(-2 * gravity * maxHeight);        //自由落体公式v^2 = 2gh => v = sqrt(2gh)
