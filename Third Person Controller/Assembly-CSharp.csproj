@@ -152,6 +152,7 @@
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\MaterialVar.cs" />
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\Mesh\MaterialChanger.cs" />
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Core\Hash.cs" />
+     <Compile Include="Assets\Scripts\PlayerSensor.cs" />
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Core\UnityUtils.cs" />
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\Tools\GizmoVisualizer.cs" />
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Behaviors\RigidConstraintsB.cs" />
@@ -401,7 +402,6 @@
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\Modes\ModifierForce.cs" />
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\RunTime Collections\AddRuntimeGameObjects.cs" />
      <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\Aim\Aim.cs" />
-     <Compile Include="Assets\Scripts\PlayerSensor.cs" />
      <None Include="Assets\Malbers Animations\Common\Shaders\Mask8Toon.shader" />
      <None Include="Assets\Malbers Animations\Common\Shaders\DragonEggs_Shader.shader" />
      <None Include="Assets\Malbers Animations\Common\Shaders\Color4x2.shader" />

@@ -9,6 +9,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -20,6 +21,7 @@ public enum PlayerPosture
     Jumping,    //跳跃
     Falling,    //高处跌落
     Landing,    //着陆（玩家刚落地还不能起跳的状态）
+    Climbing    //攀爬
 }
 
 //运动状态
@@ -49,9 +51,9 @@ public class ThirdPersonCtrl : MonoBehaviour
 
     [HideInInspector]
     public PlayerPosture playerPosture = PlayerPosture.Stand;
-    private float crouchThreshold = 0f;   //和状态机里空手运动BlendTree的阈值一致
-    private float standThreshold = 1f;
-    private float midairThreshold = 2.1f; //多0.1保证跳跃时参数大于2，防止抖动
+    private const float crouchThreshold = 0f;   //和状态机里空手运动BlendTree的阈值一致
+    private const float standThreshold = 1f;
+    private const float midairThreshold = 2.1f; //多0.1保证跳跃时参数大于2，防止抖动
     private float landingThreshold = 1f;  //着陆强度阈值（可以用下蹲强度表示着陆强度）
 
     [HideInInspector]
@@ -72,7 +74,8 @@ public class ThirdPersonCtrl : MonoBehaviour
     private int moveSpeedHash;
     private int turnSpeedHash;
     private int verticalVelHash;
-    
+    private int gridSwordIKHash;
+
     Vector3 playerMovement = Vector3.zero;  //玩家实际要移动的方向
     private bool isGrounded = false;//玩家是否着地
     private float groundCheckOffset = 0.2f; //地面检测射线偏移量
@@ -91,6 +94,16 @@ public class ThirdPersonCtrl : MonoBehaviour
     private Vector3[] velCache = new Vector3[CACHE_SIZE];
     private int currentCacheIndex = 0;  //缓存词中最老的向量索引
     Vector3 averageVel = Vector3.zero;
+
+    private PlayerSensor playerSensor;  //障碍物检测脚本
+    Vector3 PlayerMomentWorldSpace = Vector3.zero;  //玩家相对世界坐标上的输入
+    private bool isClimbReady;          //是否能攀爬
+    private int defaultClimbParameter = 0;
+    private const int vaultParamter = 1;        //翻越阈值
+    private const int lowClimbParamter = 2;     //低位攀爬阈值
+    private const int highClimbParamter = 3;    //高位攀爬阈值
+    private int currentClimbParamter;
+    private Vector3 rightHandPosition;         //攀爬时右手位置
     
     // Start is called before the first frame update
     void Start()
@@ -99,11 +112,14 @@ public class ThirdPersonCtrl : MonoBehaviour
         cameraTransform = Camera.main.transform;
         animator = GetComponent<Animator>();
         capsuleCollider = GetComponent<CapsuleCollider>();
+        playerSensor = GetComponent<PlayerSensor>();
+        
         // animState = animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex("Base Layer"));
         postureHash = Animator.StringToHash("玩家姿态");
         moveSpeedHash = Animator.StringToHash("移动速度");
         turnSpeedHash = Animator.StringToHash("转弯速度");
         verticalVelHash = Animator.StringToHash("垂直速度");
+        gridSwordIKHash = Animator.StringToHash("GridSwordIK");
     }
 
     // Update is called once per frame
@@ -116,6 +132,7 @@ public class ThirdPersonCtrl : MonoBehaviour
         CaculateInputDirection();
         SetupAnimator();
         //PlayFootStep();
+        //animator.SetLayerWeight(1,1-animator.GetFloat(gridSwordIKHash));
     }
 
     #region 输入相关
@@ -145,10 +162,13 @@ public class ThirdPersonCtrl : MonoBehaviour
     
     private void OnAnimatorIK(int layerIndex)
     {
-        animator.SetIKPosition(AvatarIKGoal.RightHand, rightHandObject.position);
-        animator.SetIKRotation(AvatarIKGoal.RightHand, rightHandObject.rotation);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightHand,1f);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightHand,1f);
+        if (animator.GetFloat(gridSwordIKHash) < 0.5f)
+        {
+            animator.SetIKPosition(AvatarIKGoal.RightHand, rightHandObject.position);
+            animator.SetIKRotation(AvatarIKGoal.RightHand, rightHandObject.rotation);
+            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f );
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f );
+        }
     }
     
     //切换玩家状态
@@ -169,6 +189,11 @@ public class ThirdPersonCtrl : MonoBehaviour
                 {
                     playerPosture = PlayerPosture.Crouch;
                 }
+                else if (isClimbReady)
+                {
+                    playerPosture = PlayerPosture.Climbing;
+                }
+                isClimbReady = false;
                 break;
             case PlayerPosture.Crouch:
                 if (!isGrounded && couldFall)
@@ -179,6 +204,7 @@ public class ThirdPersonCtrl : MonoBehaviour
                 {
                     playerPosture = PlayerPosture.Stand;
                 }
+                isClimbReady = false;
                 break;
             case PlayerPosture.Falling:
                 if (isGrounded)
@@ -190,20 +216,36 @@ public class ThirdPersonCtrl : MonoBehaviour
                 {
                     playerPosture = PlayerPosture.Landing;
                 }
+                isClimbReady = false;
                 break;
             case PlayerPosture.Jumping:
                 if (isGrounded)
                 {
                     StartCoroutine(CoolDownJump());
                 }
+                // else if (isClimbReady)
+                // {
+                //     playerPosture = PlayerPosture.Climbing;
+                // }
                 
                 if (isLanding)
                 {
                     playerPosture = PlayerPosture.Landing;
                 }
+                isClimbReady = false;
                 break;
             case PlayerPosture.Landing:
                 if (!isLanding)
+                {
+                    playerPosture = PlayerPosture.Stand;
+                }
+                isClimbReady = false;
+                break;
+            case PlayerPosture.Climbing:
+                AnimatorController animatorController = animator.runtimeAnimatorController as AnimatorController;
+                AnimatorStateMachine rootStateMachine = animatorController.layers[0].stateMachine; // 假设使用的是第一个Layer
+                AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0); // 获取第一个Layer的当前状态
+                if (!currentState.IsName("ClimbHigh") && !currentState.IsName("ClimbLow")  && !animator.IsInTransition(0))
                 {
                     playerPosture = PlayerPosture.Stand;
                 }
@@ -241,9 +283,9 @@ public class ThirdPersonCtrl : MonoBehaviour
         // float y = cameraTransform.rotation.eulerAngles.y;
         // playerMovement = Quaternion.Euler(0, y, 0) * camForwawrdProjection;
         Vector3 camForwawrdProjection = new Vector3(cameraTransform.forward.x, 0, cameraTransform.forward.z).normalized;//相机在水平方向的投影
-        playerMovement = MoveInput.y * camForwawrdProjection + MoveInput.x * cameraTransform.right;
+        PlayerMomentWorldSpace = MoveInput.y * camForwawrdProjection + MoveInput.x * cameraTransform.right;
 
-        playerMovement = playerTransform.InverseTransformVector(playerMovement);   //将世界坐标转为本地坐标
+        playerMovement = playerTransform.InverseTransformVector(PlayerMomentWorldSpace);   //将世界坐标转为本地坐标
     }
     
     //检测是否在地上
@@ -377,6 +419,27 @@ public class ThirdPersonCtrl : MonoBehaviour
                     break;
             }
         }
+        else if (playerPosture == PlayerPosture.Climbing)
+        {
+            animator.SetInteger("ClimbType",currentClimbParamter);
+            playerTransform.rotation = Quaternion.Lerp(playerTransform.rotation,Quaternion.LookRotation(-playerSensor.climbHitNormal),0.5f );   //转向障碍物
+            AnimatorController animatorController = animator.runtimeAnimatorController as AnimatorController;
+            AnimatorStateMachine rootStateMachine = animatorController.layers[0].stateMachine; // 假设使用的是第一个Layer
+            AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0); // 获取第一个Layer的当前状态
+            if (currentState.IsName("ClimbLow"))
+            {
+                Debug.Log("========IsName clim low");
+                currentClimbParamter = defaultClimbParameter;
+                animator.MatchTarget(rightHandPosition,Quaternion.identity, AvatarTarget.RightHand,new MatchTargetWeightMask(Vector3.one,0f),0f,0.15f); //从动画0%开始对齐，15%地方完成对齐
+                animator.MatchTarget(rightHandPosition+Vector3.up * 0.18f,Quaternion.identity, AvatarTarget.RightHand,new MatchTargetWeightMask(Vector3.up,0f),0.15f,0.58f);
+            }
+            else if(currentState.IsName("ClimbHigh"))
+            {
+                Debug.Log("========IsName clim HIGH");
+                currentClimbParamter = defaultClimbParameter;
+                animator.MatchTarget(rightHandPosition,Quaternion.identity, AvatarTarget.RightHand,new MatchTargetWeightMask(Vector3.one,0f),0.05f,0.53f);
+            }
+        }
 
         if (attackState == AttackState.Normal && playerPosture != PlayerPosture.Jumping)
         {
@@ -422,8 +485,17 @@ public class ThirdPersonCtrl : MonoBehaviour
     //动画系统回调方法，接管rootmotion位移
     private void OnAnimatorMove()
     {
-        if (playerPosture != PlayerPosture.Jumping && playerPosture != PlayerPosture.Falling)
+        if (playerPosture == PlayerPosture.Climbing)
         {
+            //通过动画曲线取消IK，并且在这边手动禁用碰撞体
+            capsuleCollider.enabled = false;
+            animator.ApplyBuiltinRootMotion();  //将控制权还给root motion
+            gravity = 0;
+        } 
+        else if (playerPosture != PlayerPosture.Jumping && playerPosture != PlayerPosture.Falling)
+        {
+            capsuleCollider.enabled = true;
+            gravity = -15f;
             Vector3 playerDeltaMovement = animator.deltaPosition;
             playerDeltaMovement.y = verticalVelocity * Time.deltaTime;
             //Debug.LogFormat("playerDeltaMovement.y:{0}",playerDeltaMovement.y);
@@ -433,6 +505,8 @@ public class ThirdPersonCtrl : MonoBehaviour
         }
         else
         {
+            capsuleCollider.enabled = true;
+            gravity = -15f;
             averageVel.y = verticalVelocity;
             //沿用地面速度，比如角色离地前几帧的平均速度，解决跳跃时水平方向移动异常问题
             Vector3 playerDeltaMovement = averageVel * Time.deltaTime;  //平均速度*时间，animator.deltaPosition会受帧率影响，跳跃前后帧率差异可能较大，平均值不具备参考性
@@ -445,8 +519,44 @@ public class ThirdPersonCtrl : MonoBehaviour
     {
         if (playerPosture == PlayerPosture.Stand && isJumpPress)
         {
-            Debug.Log("jump here");
-            verticalVelocity = Mathf.Sqrt(-2 * gravity * maxHeight);        //自由落体公式v^2 = 2gh => v = sqrt(2gh)
+            float velOffset;    //不同状态下翻越障碍物距离应该有差异
+            switch (locomotionState)
+            {
+                case LocomotionState.Run:
+                    velOffset = 1f;
+                    break;
+                case LocomotionState.Walk:
+                    velOffset = 0.5f;
+                    break;
+                case LocomotionState.Idle:
+                default:
+                    velOffset = 0f;
+                    break;
+            }
+            switch (playerSensor.ClimbDetect(playerTransform,PlayerMomentWorldSpace,velOffset))
+            {
+                case NextPlayerMovement.jump:
+                    Debug.Log("jump here");
+                    verticalVelocity = Mathf.Sqrt(-2 * gravity * maxHeight);        //自由落体公式v^2 = 2gh => v = sqrt(2gh)
+                    break;
+                case NextPlayerMovement.climbLow:
+                    //动画攀爬时右手支撑，在进度15%时应该放在检测的障碍物边缘右边一点位置
+                    rightHandPosition = playerSensor.ledge +
+                                        Vector3.Cross(-playerSensor.climbHitNormal, Vector3.down) * 0.3f;   //叉乘得到右边位置
+                    currentClimbParamter = lowClimbParamter;
+                    isClimbReady = true;
+                    break;
+                case NextPlayerMovement.climbHigh:
+                    currentClimbParamter = highClimbParamter;
+                    isClimbReady = true;
+                    break;
+                case NextPlayerMovement.vault:
+                    Debug.Log("========VAULT");
+                    currentClimbParamter = vaultParamter;
+                    isClimbReady = true;
+                    break;
+            }
+            
         }
     }
 }

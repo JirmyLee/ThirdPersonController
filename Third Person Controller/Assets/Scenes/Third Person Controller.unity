@@ -14337,7 +14337,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 567985581}
-  m_LocalRotation: {x: 0.118038066, y: -0.000000004255946, z: 5.059003e-10, w: 0.9930091}
+  m_LocalRotation: {x: 0.118038066, y: -0.0000000042715236, z: 5.0775206e-10, w: 0.9930091}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -17469,8 +17469,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1162763395}
-  m_LocalRotation: {x: 0.11803808, y: -0.0000000085352685, z: 0.0000000010145795,
-    w: 0.9930091}
+  m_LocalRotation: {x: 0.11803808, y: -0.000000008543047, z: 0.0000000010155041, w: 0.9930091}
   m_LocalPosition: {x: -11.2, y: 2.0000012, z: -5.91}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -18003,9 +18002,10 @@ GameObject:
   - component: {fileID: 1231543646}
   - component: {fileID: 1231543645}
   - component: {fileID: 1231543648}
-  - component: {fileID: 1231543649}
   - component: {fileID: 1231543651}
   - component: {fileID: 1231543652}
+  - component: {fileID: 1231543649}
+  - component: {fileID: 1231543653}
   m_Layer: 8
   m_Name: MiYing
   m_TagString: Untagged
@@ -18201,6 +18201,25 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &1231543653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231543643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85cbbf5d84dc0f84084f7d114204abd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextMovement: 0
+  lowClimbHeight: 0.5
+  checkDistance: 1
+  bodyHeight: 1
+  highClimbHeight: 1.6
+  climbHitNormal: {x: 0, y: 0, z: 0}
+  ledge: {x: 0, y: 0, z: 0}
 --- !u!4 &1237694507 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4871792560986470, guid: aa3adfd5958b2114592cdff1ec26c7de,
@@ -22299,7 +22318,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1823866274}
-  m_LocalRotation: {x: 0.09853765, y: -0.000000007414322, z: 7.3416284e-10, w: 0.99513334}
+  m_LocalRotation: {x: 0.098537646, y: -8.8385596e-16, z: -2.350329e-17, w: 0.99513334}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -28224,7 +28243,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1961079092}
-  m_LocalRotation: {x: 0.15331323, y: -0.000000016683213, z: 0.0000000025883578, w: 0.98817766}
+  m_LocalRotation: {x: 0.15331323, y: 0.000000017002959, z: -0.0000000026379654, w: 0.98817766}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
