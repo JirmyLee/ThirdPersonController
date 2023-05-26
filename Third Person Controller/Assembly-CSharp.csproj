@@ -692,6 +692,12 @@
      <Reference Include="Newtonsoft.Json">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\PackageCache\com.unity.nuget.newtonsoft-json@3.0.2\Runtime\Newtonsoft.Json.dll</HintPath>
      </Reference>
+     <Reference Include="Unity.Collections.LowLevel.ILSupport">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\PackageCache\com.unity.collections@1.4.0\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+     </Reference>
+     <Reference Include="Mono.Cecil">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\PackageCache\com.unity.nuget.mono-cecil@1.11.4\Mono.Cecil.dll</HintPath>
+     </Reference>
      <Reference Include="UnityEditor.iOS.Extensions.Xcode">
      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.8f1c1\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
      </Reference>
@@ -1196,8 +1202,31 @@
      <Reference Include="Unity.VisualScripting.State">
      <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
      </Reference>
+     <Reference Include="Unity.Collections.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Collections.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Collections">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Jobs">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Jobs.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Animation.Rigging.Editor">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Animation.Rigging.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Animation.Rigging">
+     <HintPath>E:\WorkSpace\Unity\ThirdPersonController\Third Person Controller\Library\ScriptAssemblies\Unity.Animation.Rigging.dll</HintPath>
+     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="MagicaCloth.csproj">
+      <Project>{b43b7c8e-58d4-3855-32a4-fa64bf86ab5b}</Project>
+      <Name>MagicaCloth</Name>
+    </ProjectReference>
+    <ProjectReference Include="MagicaCloth.Editor.csproj">
+      <Project>{9af195f0-db49-3173-b822-f56e58614ba0}</Project>
+      <Name>MagicaCloth.Editor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
